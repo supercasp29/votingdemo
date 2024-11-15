@@ -109,6 +109,24 @@ def get_results():
     
     return jsonify(vote_count), 200
 
+@app.route('/candidates', methods=['GET'])
+def get_candidates():
+    try:
+        # Get all keys that start with 'candidate:'
+        keys = redis_client.keys("candidate:*")
+        
+        # Extract candidate ids (remove the 'candidate:' prefix)
+        candidates = [key.split(":")[1] for key in keys]
+        
+        # Ensure unique candidates and sort them alphabetically
+        unique_candidates = sorted(set(candidates))
+        
+        return jsonify(unique_candidates), 200
+    
+    except Exception as e:
+        return jsonify({"message": f"An error occurred: {str(e)}"}), 500
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
